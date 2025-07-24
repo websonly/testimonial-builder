@@ -78,12 +78,13 @@ export default function Home() {
         </select>
 
         <button
-          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 w-full"
+          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 w-full disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={handleSubmit}
-          disabled={loading}
+          disabled={loading || !Object.values(selectedStyles).some(Boolean)}
         >
           {loading ? 'Generando...' : 'Crear Testimonios'}
         </button>
+
 
         {result && (
           <div className="mt-6 space-y-4">

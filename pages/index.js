@@ -7,12 +7,21 @@ export default function Home() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
 
+
+  const [selectedStyles, setSelectedStyles] = useState({
+  profesional: true,
+  emocional: true,
+  seo: true
+})
+
+
+  
   const handleSubmit = async () => {
     setLoading(true)
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ review, product, length })
+      body: JSON.stringify({ review, product, selectedStyles })
     })
     const data = await res.json()
     setResult(data)
@@ -33,6 +42,24 @@ export default function Home() {
           onChange={(e) => setProduct(e.target.value)}
         />
         <textarea
+            
+  <div className="mb-4">
+  <h2 className="font-semibold mb-2">Estilos a generar:</h2>
+  {['profesional', 'emocional', 'seo'].map((style) => (
+    <label key={style} className="block text-sm">
+      <input
+        type="checkbox"
+        checked={selectedStyles[style]}
+        onChange={() =>
+          setSelectedStyles(prev => ({ ...prev, [style]: !prev[style] }))
+        }
+        className="mr-2"
+      />
+      {style.charAt(0).toUpperCase() + style.slice(1)}
+    </label>
+  ))}
+</div>
+
           className="w-full p-2 border mb-2 rounded"
           rows={5}
           placeholder="Escribe la reseña original del cliente"

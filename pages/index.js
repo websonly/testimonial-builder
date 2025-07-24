@@ -87,7 +87,7 @@ export default function Home() {
 
         {result && (
           <div className="mt-6 space-y-4">
-            {['profesional', 'emocional', 'seo'].map((type) => (
+            {Object.entries(selectedStyles).filter(([_, isSelected]) => isSelected).map(([type]) => (
               <div key={type} className="border p-4 rounded bg-gray-50">
                 <div className="flex justify-between items-center">
                   <h2 className="font-semibold capitalize">{type}</h2>

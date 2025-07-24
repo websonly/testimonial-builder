@@ -12,12 +12,6 @@ export default function Home() {
 
 
 
-  const [selectedStyles, setSelectedStyles] = useState({
-  profesional: true,
-  emocional: true,
-  seo: true
-})
-
 
   
 const handleSubmit = async () => {

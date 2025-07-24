@@ -59,7 +59,7 @@ export default function Home() {
                     Copiar
                   </button>
                 </div>
-                <p className="mt-2 text-sm text-gray-800">{result[type]}</p>
+                  <div className="mt-2 prose prose-sm text-gray-800">{result[type]}</div>
               </div>
             ))}
           </div>

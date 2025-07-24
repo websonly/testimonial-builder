@@ -34,32 +34,31 @@ export default function Home() {
         <h1 className="text-4xl font-bold text-purple-600 underline mb-6">
           Generador de Testimonios con IA
         </h1>
-
+    
+         <div className="mb-4">
+          <h2 className="font-semibold mb-2">Estilos a generar:</h2>
+          {['profesional', 'emocional', 'seo'].map((style) => (
+            <label key={style} className="block text-sm">
+              <input
+                type="checkbox"
+                checked={selectedStyles[style]}
+                onChange={() =>
+                  setSelectedStyles(prev => ({ ...prev, [style]: !prev[style] }))
+                }
+                className="mr-2"
+              />
+              {style.charAt(0).toUpperCase() + style.slice(1)}
+            </label>
+          ))}
+        </div>
+          
         <input
           className="w-full p-2 border mb-2 rounded"
           placeholder="Nombre del producto o servicio"
           value={product}
           onChange={(e) => setProduct(e.target.value)}
         />
-        <textarea
-            
-  <div className="mb-4">
-  <h2 className="font-semibold mb-2">Estilos a generar:</h2>
-  {['profesional', 'emocional', 'seo'].map((style) => (
-    <label key={style} className="block text-sm">
-      <input
-        type="checkbox"
-        checked={selectedStyles[style]}
-        onChange={() =>
-          setSelectedStyles(prev => ({ ...prev, [style]: !prev[style] }))
-        }
-        className="mr-2"
-      />
-      {style.charAt(0).toUpperCase() + style.slice(1)}
-    </label>
-  ))}
-</div>
-
+        <textarea 
           className="w-full p-2 border mb-2 rounded"
           rows={5}
           placeholder="Escribe la reseña original del cliente"

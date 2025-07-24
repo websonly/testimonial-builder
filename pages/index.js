@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow">
-        <h1 className="text-2xl font-bold mb-4">Generador de Testimonios con IA</h1>
+        <h1 className="text-4xl font-bold mb-4">Generador de Testimonios con IA</h1>
         <input
           className="w-full p-2 border mb-2 rounded"
           placeholder="Nombre del producto o servicio"

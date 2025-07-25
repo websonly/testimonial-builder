@@ -1,4 +1,4 @@
-import { getPostBySlug, getPostSlugs } from '@/lib/posts'
+import { getPostBySlug, getPostSlugs } from '../../lib/posts'
 import { remark } from 'remark'
 import html from 'remark-html'
 

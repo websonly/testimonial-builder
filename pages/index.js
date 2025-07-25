@@ -7,7 +7,8 @@ export default function Home() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [selectedStyles, setSelectedStyles] = useState(['profesional', 'emocional', 'seo'])
-  const [customStyles, setCustomStyles] = useState('')
+  const [customTags, setCustomTags] = useState([])
+  const [customInput, setCustomInput] = useState('')
   const [onlyCustom, setOnlyCustom] = useState(false)
 
 
@@ -18,24 +19,20 @@ const handleSubmit = async () => {
   setLoading(true)
 
   // Construimos la lista final de estilos
-  let styles = []
+let styles = []
 
-  if (!onlyCustom) {
-    styles = [...selectedStyles]
+if (onlyCustom) {
+  styles = [...customTags]
+} else {
+  styles = Object.entries(selectedStyles)
+    .filter(([_, isSelected]) => isSelected)
+    .map(([style]) => style)
+
+  if (customTags.length > 0) {
+    styles = [...styles, ...customTags]
   }
+}
 
-  if (customStyles.trim() !== '') {
-    const customList = customStyles
-      .split(',')
-      .map((s) => s.trim().toLowerCase())
-      .filter((s) => s.length > 0)
-
-    if (onlyCustom) {
-      styles = customList
-    } else {
-      styles = [...styles, ...customList.filter((s) => !styles.includes(s))]
-    }
-  }
 
   const res = await fetch('/api/generate', {
     method: 'POST',
@@ -86,13 +83,48 @@ const handleSubmit = async () => {
         Usar solo estilos personalizados
       </label>
     
-      <input
-        type="text"
-        placeholder="Estilos personalizados separados por coma"
-        className="w-full p-2 border rounded mt-1"
-        value={customStyles}
-        onChange={(e) => setCustomStyles(e.target.value)}
-      />
+    <div className="mb-4">
+  <label className="block text-sm font-medium mb-1">Estilos personalizados:</label>
+  <div className="flex flex-wrap gap-2 mb-2">
+    {customTags.map((tag, index) => (
+      <div key={index} className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full flex items-center space-x-1">
+        <span>{tag}</span>
+        <button
+          type="button"
+          onClick={() =>
+            setCustomTags(customTags.filter((_, i) => i !== index))
+          }
+          className="text-purple-500 hover:text-purple-700"
+        >
+          &times;
+        </button>
+      </div>
+    ))}
+  </div>
+  <div className="flex gap-2">
+    <input
+      type="text"
+      value={customInput}
+      onChange={(e) => setCustomInput(e.target.value)}
+      placeholder="Escribe un estilo y pulsa Añadir"
+      className="flex-1 border px-2 py-1 rounded"
+    />
+    <button
+      type="button"
+      onClick={() => {
+        const trimmed = customInput.trim()
+        if (trimmed && !customTags.includes(trimmed)) {
+          setCustomTags([...customTags, trimmed])
+          setCustomInput('')
+        }
+      }}
+      className="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700"
+    >
+      Añadir
+    </button>
+  </div>
+</div>
+
     </div>
 
           

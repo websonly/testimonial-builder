@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Link from 'next/link'
 
 export default function Home() {
   const [review, setReview] = useState('')
@@ -53,10 +54,6 @@ export default function Home() {
     setLoading(false)
   }
     
-<Link href="/blog" className="text-blue-500 hover:underline block mt-4">
-  Leer el blog →
-</Link>
-
   const handleDownload = () => {
     if (!result) return
 
@@ -388,5 +385,8 @@ export default function Home() {
         )}
       </div>
     </div>
+<Link href="/blog" className="text-blue-500 hover:underline block mt-4">
+  Leer el blog →
+</Link>
   )
 }

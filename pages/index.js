@@ -6,25 +6,26 @@ export default function Home() {
   const [length, setLength] = useState('media')
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
+
   const [selectedStyles, setSelectedStyles] = useState(['profesional', 'emocional', 'seo'])
-  const [customTags, setCustomTags] = useState([])
+  const [customTags, setCustomTags] = useState<string[]>([])
   const [customInput, setCustomInput] = useState('')
   const [onlyCustom, setOnlyCustom] = useState(false)
+
   const [downloadFormat, setDownloadFormat] = useState('json')
+
   const [history, setHistory] = useState([])
   const [historyDownloadFormat, setHistoryDownloadFormat] = useState('json')
 
   const handleSubmit = async () => {
     setLoading(true)
 
-    let styles = []
+    let styles: string[] = []
     if (onlyCustom) {
       styles = [...customTags]
     } else {
-      styles = selectedStyles
-      if (customTags.length > 0) {
-        styles = [...styles, ...customTags]
-      }
+      styles = [...selectedStyles]
+      if (customTags.length > 0) styles = [...styles, ...customTags]
     }
 
     const res = await fetch('/api/generate', {
@@ -36,17 +37,18 @@ export default function Home() {
     const data = await res.json()
     setResult(data)
 
-    setHistory([
-      ...history,
+    setHistory(prev => ([
       {
+        id: Date.now(),
         product,
         review,
         styles,
         length,
         result: data,
-        timestamp: new Date().toLocaleString()
-      }
-    ])
+        timestamp: new Date().toISOString()
+      },
+      ...prev
+    ]))
 
     setLoading(false)
   }
@@ -88,7 +90,7 @@ export default function Home() {
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `testimonio-${product || 'producto'}.${downloadFormat}`
+    link.download = `testimonio-${(product || 'producto').replace(/\s+/g, '-').toLowerCase()}.${downloadFormat}`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -96,7 +98,7 @@ export default function Home() {
   }
 
   const handleDownloadHistory = () => {
-    if (history.length === 0) return
+    if (!history.length) return
 
     let content = ''
     let mimeType = 'application/json'
@@ -108,7 +110,7 @@ export default function Home() {
         break
       case 'html':
         content = history
-          .map((entry) =>
+          .map(entry =>
             `<h2>${entry.product}</h2><small>${entry.timestamp}</small>` +
             Object.entries(entry.result)
               .map(([style, text]) => `<h3>${style}</h3><p>${text}</p>`)
@@ -119,7 +121,7 @@ export default function Home() {
         break
       case 'markdown':
         content = history
-          .map((entry) =>
+          .map(entry =>
             `## ${entry.product} (${entry.timestamp})\n\n` +
             Object.entries(entry.result)
               .map(([style, text]) => `### ${style}\n\n${text}`)
@@ -130,7 +132,7 @@ export default function Home() {
         break
       case 'txt':
         content = history
-          .map((entry) =>
+          .map(entry =>
             `PRODUCTO: ${entry.product} (${entry.timestamp})\n` +
             Object.entries(entry.result)
               .map(([style, text]) => `\n${style.toUpperCase()}:\n${text}`)
@@ -156,29 +158,30 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow">
+      <div className="max-w-5xl mx-auto bg-white p-6 rounded-2xl shadow">
         <h1 className="text-4xl font-bold text-purple-600 underline mb-6">
           Generador de Testimonios con IA
         </h1>
 
+        {/* Estilos */}
         <div className="mb-4">
           <h2 className="font-semibold mb-2">Estilos a generar:</h2>
           {['profesional', 'emocional', 'seo'].map((style) => (
-            <label key={style} className="block text-sm mb-1">
-              <input
-                type="checkbox"
-                checked={selectedStyles.includes(style)}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setSelectedStyles([...selectedStyles, style])
-                  } else {
-                    setSelectedStyles(selectedStyles.filter((s) => s !== style))
-                  }
-                }}
-                className="mr-2"
-              />
-              {style}
-            </label>
+          <label key={style} className="block text-sm mb-1">
+            <input
+              type="checkbox"
+              checked={selectedStyles.includes(style)}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setSelectedStyles([...selectedStyles, style])
+                } else {
+                  setSelectedStyles(selectedStyles.filter((s) => s !== style))
+                }
+              }}
+              className="mr-2"
+            />
+            {style}
+          </label>
           ))}
 
           <label className="block text-sm mt-3 mb-1">
@@ -191,6 +194,7 @@ export default function Home() {
             Usar solo estilos personalizados
           </label>
 
+          {/* Tags personalizados */}
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Estilos personalizados:</label>
             <div className="flex flex-wrap gap-2 mb-2">
@@ -235,6 +239,7 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Inputs */}
         <input
           className="w-full p-2 border mb-2 rounded"
           placeholder="Nombre del producto o servicio"
@@ -259,6 +264,7 @@ export default function Home() {
           <option value="larga">Larga (1 párrafo o más)</option>
         </select>
 
+        {/* Botón generar */}
         <button
           className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 w-full disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={handleSubmit}
@@ -267,8 +273,9 @@ export default function Home() {
           {loading ? 'Generando...' : 'Crear Testimonios'}
         </button>
 
+        {/* Descarga último resultado */}
         {result && (
-          <div className="mt-4">
+          <div className="mt-6">
             <label className="block text-sm font-medium mb-1">Formato de descarga:</label>
             <select
               value={downloadFormat}
@@ -290,68 +297,89 @@ export default function Home() {
           </div>
         )}
 
-        {result &&
-          Object.entries(result).map(([style, text]) => (
-            <div key={style} className="border p-4 rounded bg-gray-50 mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <h2 className="font-semibold capitalize">{style}</h2>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => navigator.clipboard.writeText(text)}
-                    className="text-sm text-blue-500 hover:underline"
-                  >
-                    Copiar texto
-                  </button>
-                  <button
-                    onClick={() =>
-                      navigator.clipboard.writeText(`<blockquote><p>${text}</p></blockquote>`)
-                    }
-                    className="text-sm text-green-500 hover:underline"
-                  >
-                    Copiar HTML
-                  </button>
-                  <button
-                    onClick={() =>
-                      navigator.clipboard.writeText(JSON.stringify({ [style]: text }, null, 2))
-                    }
-                    className="text-sm text-purple-500 hover:underline"
-                  >
-                    Copiar JSON
-                  </button>
-                  <button
-                    onClick={() =>
-                      navigator.clipboard.writeText(`> ${text.replace(/\n/g, '\n> ')}\n> — ${style}`)
-                    }
-                    className="text-sm text-yellow-600 hover:underline"
-                  >
-                    Copiar Markdown
-                  </button>
+        {/* Resultados en grid con scroll interno */}
+        {result && (
+          <div className="mt-8 max-h-[480px] overflow-y-auto">
+            <div className="grid md:grid-cols-2 gap-4">
+              {Object.entries(result).map(([style, text]) => (
+                <div key={style} className="border p-4 rounded bg-gray-50">
+                  <div className="flex justify-between items-center mb-2">
+                    <h2 className="font-semibold capitalize">{style}</h2>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => navigator.clipboard.writeText(text)}
+                        className="text-sm text-blue-500 hover:underline"
+                      >
+                        Copiar texto
+                      </button>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(`<blockquote><p>${text}</p></blockquote>`)}
+                        className="text-sm text-green-500 hover:underline"
+                      >
+                        Copiar HTML
+                      </button>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(JSON.stringify({ [style]: text }, null, 2))}
+                        className="text-sm text-purple-500 hover:underline"
+                      >
+                        Copiar JSON
+                      </button>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(`> ${text.replace(/\n/g, '\n> ')}\n> — ${style}`)}
+                        className="text-sm text-yellow-600 hover:underline"
+                      >
+                        Copiar Markdown
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-800 whitespace-pre-line">{text}</p>
                 </div>
-              </div>
-              <p className="text-sm text-gray-800">{text}</p>
+              ))}
             </div>
-          ))}
+          </div>
+        )}
 
+        {/* Historial */}
         {history.length > 0 && (
-          <div className="mt-8">
-            <label className="block text-sm font-medium mb-1">Descargar historial como:</label>
-            <select
-              value={historyDownloadFormat}
-              onChange={(e) => setHistoryDownloadFormat(e.target.value)}
-              className="w-full p-2 border rounded mb-2 text-sm"
-            >
-              <option value="json">JSON</option>
-              <option value="html">HTML</option>
-              <option value="markdown">Markdown</option>
-              <option value="txt">Texto plano</option>
-            </select>
+          <div className="mt-10">
+            <h2 className="text-lg font-semibold mb-2">Historial de testimonios</h2>
 
-            <button
-              onClick={handleDownloadHistory}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
-            >
-              Descargar Historial
-            </button>
+            <div className="max-h-[400px] overflow-y-auto space-y-4">
+              {history.map(entry => (
+                <div key={entry.id} className="border rounded p-4 bg-gray-50">
+                  <div className="text-sm text-gray-600 mb-2">
+                    <strong>{entry.product}</strong> — {new Date(entry.timestamp).toLocaleString()}
+                  </div>
+                  {Object.entries(entry.result).map(([style, text]) => (
+                    <div key={style} className="mb-2">
+                      <p className="font-medium text-purple-600 capitalize">{style}</p>
+                      <p className="text-sm text-gray-800 whitespace-pre-line">{text}</p>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4">
+              <label className="block text-sm font-medium mb-1">Descargar historial como:</label>
+              <select
+                value={historyDownloadFormat}
+                onChange={(e) => setHistoryDownloadFormat(e.target.value)}
+                className="w-full p-2 border rounded mb-2 text-sm"
+              >
+                <option value="json">JSON</option>
+                <option value="html">HTML</option>
+                <option value="markdown">Markdown</option>
+                <option value="txt">Texto plano</option>
+              </select>
+
+              <button
+                onClick={handleDownloadHistory}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
+              >
+                Descargar historial
+              </button>
+            </div>
           </div>
         )}
       </div>

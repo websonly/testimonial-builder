@@ -385,8 +385,10 @@ export default function Home() {
         )}
       </div>
     </div>
-<Link href="/blog" className="text-blue-500 hover:underline block mt-4">
-  Leer el blog →
-</Link>
+    <Link href="/blog">
+      <a className="text-blue-500 hover:underline block mt-4 text-center">
+        Leer el blog →
+      </a>
+    </Link>
   )
 }

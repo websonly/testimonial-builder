@@ -7,12 +7,15 @@
     "build": "next build",
     "start": "next start"
   },
-  "dependencies": {
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "openai": "^4.27.0"
-  },
+ "dependencies": {
+  "next": "latest",
+  "react": "latest",
+  "react-dom": "latest",
+  "openai": "^4.27.0",
+  "gray-matter": "^4.0.3",
+  "remark": "^14.0.2",
+  "remark-html": "^15.0.1"
+},
   "devDependencies": {
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.21",

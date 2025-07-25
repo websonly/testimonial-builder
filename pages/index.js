@@ -20,7 +20,7 @@ export default function Home() {
   const handleSubmit = async () => {
     setLoading(true)
 
-    let styles: string[] = []
+    let styles = []
     if (onlyCustom) {
       styles = [...customTags]
     } else {

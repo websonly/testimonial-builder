@@ -6,13 +6,13 @@ export default function BlogIndex({ posts }) {
     <main className="max-w-4xl mx-auto py-12 px-4">
       <h1 className="text-4xl font-bold mb-8">Blog</h1>
       <ul className="space-y-6">
-        {posts.map(({ slug, metadata }) => (
+      {posts.map(({ slug, title, description, date }) => (
           <li key={slug}>
             <Link href={`/blog/${slug}`}>
               <a className="block group">
-                <h2 className="text-2xl font-semibold group-hover:underline">{metadata.title}</h2>
-                <p className="text-gray-500 text-sm">{metadata.date}</p>
-                <p className="text-gray-700 mt-2">{metadata.description}</p>
+                <h2>{title}</h2>
+                <p>{date}</p>
+                <p>{description}</p>
               </a>
             </Link>
           </li>

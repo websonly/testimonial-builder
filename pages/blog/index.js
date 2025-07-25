@@ -22,18 +22,7 @@ export default function BlogIndex({ posts }) {
   )
 }
 
-export default function Home() {
-  return (
-    <main className="max-w-3xl mx-auto py-12 px-4">
-      <h1 className="text-4xl font-bold mb-6">Bienvenido</h1>
-      <p className="mb-4">Explora nuestros artículos y contenidos.</p>
 
-      <Link href="/blog" className="text-blue-500 hover:underline">
-        Ir al Blog →
-      </Link>
-    </main>
-  )
-}
 
 export async function getStaticProps() {
   const posts = await getAllPosts()

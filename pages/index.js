@@ -162,21 +162,21 @@ if (onlyCustom) {
         </button>
 
 
-        {result &&
-  Object.entries(result).map(([style, text]) => (
-    <div key={style} className="border p-4 rounded bg-gray-50">
-      <div className="flex justify-between items-center">
-        <h2 className="font-semibold capitalize">{style}</h2>
-        <button
-          onClick={() => navigator.clipboard.writeText(text)}
-          className="text-sm text-blue-500 hover:underline"
-        >
-          Copiar
-        </button>
-      </div>
-      <p className="mt-2 text-sm text-gray-800">{text}</p>
-    </div>
-))}
+                {result &&
+          Object.entries(result).map(([style, text]) => (
+            <div key={style} className="border p-4 rounded bg-gray-50">
+              <div className="flex justify-between items-center">
+                <h2 className="font-semibold capitalize">{style}</h2>
+                <button
+                  onClick={() => navigator.clipboard.writeText(text)}
+                  className="text-sm text-blue-500 hover:underline"
+                >
+                  Copiar
+                </button>
+              </div>
+              <p className="mt-2 text-sm text-gray-800">{text}</p>
+            </div>
+        ))}
 
           </div>
         )}

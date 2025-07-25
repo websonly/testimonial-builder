@@ -1,23 +1,32 @@
 import Link from 'next/link'
-import { getAllPosts } from '../../lib/posts' 
+import { getAllPosts } from '@/lib/posts'
 
-export default async function BlogPage() {
-  const posts = await getAllPosts()
-
+export default function BlogIndex({ posts }) {
   return (
-    <div className="max-w-4xl mx-auto py-10 px-4">
-      <h1 className="text-4xl font-bold mb-8 text-purple-700">Blog</h1>
-      <div className="grid gap-6">
-        {posts.map(({ slug, frontmatter }) => (
-          <Link key={slug} href={`/blog/${slug}`}>
-            <div className="p-6 rounded-xl border shadow hover:shadow-lg transition bg-white cursor-pointer">
-              <h2 className="text-2xl font-semibold text-purple-600">{frontmatter.title}</h2>
-              <p className="text-sm text-gray-500">{frontmatter.date}</p>
-              <p className="mt-2 text-gray-700">{frontmatter.excerpt}</p>
-            </div>
-          </Link>
+    <main className="max-w-4xl mx-auto py-12 px-4">
+      <h1 className="text-4xl font-bold mb-8">Blog</h1>
+      <ul className="space-y-6">
+        {posts.map(({ slug, metadata }) => (
+          <li key={slug}>
+            <Link href={`/blog/${slug}`}>
+              <a className="block group">
+                <h2 className="text-2xl font-semibold group-hover:underline">{metadata.title}</h2>
+                <p className="text-gray-500 text-sm">{metadata.date}</p>
+                <p className="text-gray-700 mt-2">{metadata.description}</p>
+              </a>
+            </Link>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </main>
   )
+}
+
+export async function getStaticProps() {
+  const posts = getAllPosts()
+  return {
+    props: {
+      posts
+    }
+  }
 }

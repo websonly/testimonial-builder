@@ -1,10 +1,8 @@
 ---
-title: "Título del post"
-description: "Descripción breve"
+title: "Primer post de prueba"
+description: "Esto es un post generado como prueba del blog"
 date: "2025-07-25"
 ---
 
-
-# Bienvenido
-
-Esto es el contenido principal en Markdown.
+Aquí empieza el contenido del post en formato Markdown.  
+Puedes usar **negritas**, _cursivas_, listas, títulos, enlaces, etc.

@@ -1,4 +1,4 @@
-import { getAllPosts, getPostBySlug } from '@/lib/posts'
+import { getAllPosts, getPostBySlug } from '../../lib/posts'
 
 export async function generateStaticParams() {
   const posts = await getAllPosts()

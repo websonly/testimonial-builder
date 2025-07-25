@@ -1,8 +1,9 @@
 ---
-title: "Mi primer post"
+title: "Título del post"
+description: "Descripción breve"
 date: "2025-07-25"
-description: "Este es un ejemplo de post para comprobar el blog."
 ---
+
 
 # Bienvenido
 

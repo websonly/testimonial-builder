@@ -8,7 +8,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
 
   const [selectedStyles, setSelectedStyles] = useState(['profesional', 'emocional', 'seo'])
-  const [customTags, setCustomTags] = useState<string[]>([])
+  const [customTags, setCustomTags] = useState([])
   const [customInput, setCustomInput] = useState('')
   const [onlyCustom, setOnlyCustom] = useState(false)
 

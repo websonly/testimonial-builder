@@ -149,21 +149,48 @@ export default function Home() {
           {loading ? 'Generando...' : 'Crear Testimonios'}
         </button>
 
-        {result &&
-          Object.entries(result).map(([style, text]) => (
-            <div key={style} className="border p-4 rounded bg-gray-50 mt-4">
-              <div className="flex justify-between items-center">
-                <h2 className="font-semibold capitalize">{style}</h2>
-                <button
-                  onClick={() => navigator.clipboard.writeText(text)}
-                  className="text-sm text-blue-500 hover:underline"
-                >
-                  Copiar
-                </button>
-              </div>
-              <p className="mt-2 text-sm text-gray-800">{text}</p>
-            </div>
-          ))}
+      {result &&
+  Object.entries(result).map(([style, text]) => (
+    <div key={style} className="border p-4 rounded bg-gray-50 mb-4">
+      <div className="flex justify-between items-center mb-2">
+        <h2 className="font-semibold capitalize">{style}</h2>
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigator.clipboard.writeText(text)}
+            className="text-sm text-blue-500 hover:underline"
+          >
+            Copiar texto
+          </button>
+          <button
+            onClick={() =>
+              navigator.clipboard.writeText(`<blockquote><p>${text}</p></blockquote>`)
+            }
+            className="text-sm text-green-500 hover:underline"
+          >
+            Copiar HTML
+          </button>
+          <button
+            onClick={() =>
+              navigator.clipboard.writeText(JSON.stringify({ [style]: text }, null, 2))
+            }
+            className="text-sm text-purple-500 hover:underline"
+          >
+            Copiar JSON
+          </button>
+          <button
+            onClick={() =>
+              navigator.clipboard.writeText(`> ${text.replace(/\n/g, '\n> ')}\n> — ${style}`)
+            }
+            className="text-sm text-yellow-600 hover:underline"
+          >
+            Copiar Markdown
+          </button>
+        </div>
+      </div>
+      <p className="text-sm text-gray-800">{text}</p>
+    </div>
+  ))}
+
       </div>
     </div>
   )

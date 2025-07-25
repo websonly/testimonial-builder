@@ -5,13 +5,14 @@ export default function Home() {
   const [product, setProduct] = useState('')
   const [length, setLength] = useState('media')
   const [result, setResult] = useState(null)
-  const [log, setLog] = useState([])
   const [loading, setLoading] = useState(false)
   const [selectedStyles, setSelectedStyles] = useState(['profesional', 'emocional', 'seo'])
   const [customTags, setCustomTags] = useState([])
   const [customInput, setCustomInput] = useState('')
   const [onlyCustom, setOnlyCustom] = useState(false)
   const [downloadFormat, setDownloadFormat] = useState('json')
+  const [history, setHistory] = useState([])
+  const [historyDownloadFormat, setHistoryDownloadFormat] = useState('json')
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -35,13 +36,15 @@ export default function Home() {
     const data = await res.json()
     setResult(data)
 
-    setLog(prev => [
-      ...prev,
+    setHistory([
+      ...history,
       {
-        timestamp: new Date().toISOString(),
         product,
-        sourceReview: review,
-        result: data
+        review,
+        styles,
+        length,
+        result: data,
+        timestamp: new Date().toLocaleString()
       }
     ])
 
@@ -92,15 +95,59 @@ export default function Home() {
     URL.revokeObjectURL(url)
   }
 
-  const handleLogDownload = () => {
-    if (!log.length) return
-    const blob = new Blob([JSON.stringify(log, null, 2)], {
-      type: 'application/json'
-    })
+  const handleDownloadHistory = () => {
+    if (history.length === 0) return
+
+    let content = ''
+    let mimeType = 'application/json'
+
+    switch (historyDownloadFormat) {
+      case 'json':
+        content = JSON.stringify(history, null, 2)
+        mimeType = 'application/json'
+        break
+      case 'html':
+        content = history
+          .map((entry) =>
+            `<h2>${entry.product}</h2><small>${entry.timestamp}</small>` +
+            Object.entries(entry.result)
+              .map(([style, text]) => `<h3>${style}</h3><p>${text}</p>`)
+              .join('')
+          )
+          .join('<hr>')
+        mimeType = 'text/html'
+        break
+      case 'markdown':
+        content = history
+          .map((entry) =>
+            `## ${entry.product} (${entry.timestamp})\n\n` +
+            Object.entries(entry.result)
+              .map(([style, text]) => `### ${style}\n\n${text}`)
+              .join('\n\n')
+          )
+          .join('\n\n---\n\n')
+        mimeType = 'text/markdown'
+        break
+      case 'txt':
+        content = history
+          .map((entry) =>
+            `PRODUCTO: ${entry.product} (${entry.timestamp})\n` +
+            Object.entries(entry.result)
+              .map(([style, text]) => `\n${style.toUpperCase()}:\n${text}`)
+              .join('\n')
+          )
+          .join('\n\n----------------------\n\n')
+        mimeType = 'text/plain'
+        break
+      default:
+        return
+    }
+
+    const blob = new Blob([content], { type: mimeType })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = 'historial-testimonios.json'
+    link.download = `historial-testimonios.${historyDownloadFormat}`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -285,38 +332,25 @@ export default function Home() {
             </div>
           ))}
 
-        {log.length > 0 && (
-          <div className="mt-6 border-t pt-4">
-            <h2 className="font-semibold mb-2">Historial de testimonios generados</h2>
-            <button
-              onClick={() => setLog([])}
-              className="text-sm text-red-600 hover:underline mb-2"
+        {history.length > 0 && (
+          <div className="mt-8">
+            <label className="block text-sm font-medium mb-1">Descargar historial como:</label>
+            <select
+              value={historyDownloadFormat}
+              onChange={(e) => setHistoryDownloadFormat(e.target.value)}
+              className="w-full p-2 border rounded mb-2 text-sm"
             >
-              Vaciar historial
-            </button>
-
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {log.map((entry, index) => (
-                <div key={index} className="bg-gray-100 p-2 rounded text-sm">
-                  <p>
-                    <strong>{entry.product}</strong> (
-                    {new Date(entry.timestamp).toLocaleString()})
-                  </p>
-                  <p className="text-gray-600 italic">"{entry.sourceReview}"</p>
-                  {Object.entries(entry.result).map(([style, text]) => (
-                    <p key={style}>
-                      <strong>{style}:</strong> {text}
-                    </p>
-                  ))}
-                </div>
-              ))}
-            </div>
+              <option value="json">JSON</option>
+              <option value="html">HTML</option>
+              <option value="markdown">Markdown</option>
+              <option value="txt">Texto plano</option>
+            </select>
 
             <button
-              onClick={handleLogDownload}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mt-3 w-full"
+              onClick={handleDownloadHistory}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
             >
-              Descargar historial
+              Descargar Historial
             </button>
           </div>
         )}

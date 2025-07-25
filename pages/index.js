@@ -384,11 +384,13 @@ export default function Home() {
           </div>
         )}
       </div>
-    </div>
-    <Link href="/blog">
+
+     <Link href="/blog">
       <a className="text-blue-500 hover:underline block mt-4 text-center">
         Leer el blog →
       </a>
     </Link>
+    
+    </div>
   )
 }

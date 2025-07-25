@@ -10,6 +10,8 @@ export default function Home() {
   const [customTags, setCustomTags] = useState([])
   const [customInput, setCustomInput] = useState('')
   const [onlyCustom, setOnlyCustom] = useState(false)
+  const [downloadFormat, setDownloadFormat] = useState('json')
+
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -36,6 +38,52 @@ export default function Home() {
     setLoading(false)
   }
 
+const handleDownload = () => {
+  if (!result) return
+
+  let content = ''
+  let mimeType = 'application/json'
+
+  switch (downloadFormat) {
+    case 'json':
+      content = JSON.stringify(result, null, 2)
+      mimeType = 'application/json'
+      break
+    case 'html':
+      content = Object.entries(result)
+        .map(([style, text]) => `<h2>${style}</h2><p>${text}</p>`)
+        .join('<hr>')
+      mimeType = 'text/html'
+      break
+    case 'markdown':
+      content = Object.entries(result)
+        .map(([style, text]) => `## ${style}\n\n${text}`)
+        .join('\n\n---\n\n')
+      mimeType = 'text/markdown'
+      break
+    case 'txt':
+      content = Object.entries(result)
+        .map(([style, text]) => `${style.toUpperCase()}:\n${text}`)
+        .join('\n\n----------------------\n\n')
+      mimeType = 'text/plain'
+      break
+    default:
+      return
+  }
+
+  const blob = new Blob([content], { type: mimeType })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `testimonio-${product || 'producto'}.${downloadFormat}`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
+
+  
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow">
@@ -148,6 +196,38 @@ export default function Home() {
         >
           {loading ? 'Generando...' : 'Crear Testimonios'}
         </button>
+
+<button
+  className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 w-full disabled:opacity-50 disabled:cursor-not-allowed"
+  onClick={handleSubmit}
+  disabled={loading || !Object.values(selectedStyles).some(Boolean)}
+>
+  {loading ? 'Generando...' : 'Crear Testimonios'}
+</button>
+
+{result && (
+  <div className="mt-4">
+    <label className="block text-sm font-medium mb-1">Formato de descarga:</label>
+    <select
+      value={downloadFormat}
+      onChange={(e) => setDownloadFormat(e.target.value)}
+      className="w-full p-2 border rounded mb-2 text-sm"
+    >
+      <option value="json">JSON</option>
+      <option value="html">HTML</option>
+      <option value="markdown">Markdown</option>
+      <option value="txt">Texto plano</option>
+    </select>
+
+    <button
+      onClick={handleDownload}
+      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full"
+    >
+      Descargar testimonio
+    </button>
+  </div>
+)}
+
 
       {result &&
   Object.entries(result).map(([style, text]) => (

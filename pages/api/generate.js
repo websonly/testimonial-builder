@@ -15,9 +15,9 @@ export default async function handler(req, res) {
     larga: 'de forma extensa, en un párrafo o más'
   }
 
-  const estiloTexto = styles
-    .map((style, idx) => `${idx + 1}. Estilo "${style}".`)
-    .join('\n')
+const estiloTexto = styles
+  .map((s, i) => `${i + 1}. ${s.charAt(0).toUpperCase()}${s.slice(1)}.`)
+  .join('\n')
 
   const prompt = `
 Rescribe la siguiente reseña sobre el producto o servicio "${product}" en los siguientes estilos, redactados ${longitudes[length] || longitudes['media']}:

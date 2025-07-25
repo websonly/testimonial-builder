@@ -197,13 +197,6 @@ const handleDownload = () => {
           {loading ? 'Generando...' : 'Crear Testimonios'}
         </button>
 
-<button
-  className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 w-full disabled:opacity-50 disabled:cursor-not-allowed"
-  onClick={handleSubmit}
-  disabled={loading || !Object.values(selectedStyles).some(Boolean)}
->
-  {loading ? 'Generando...' : 'Crear Testimonios'}
-</button>
 
 {result && (
   <div className="mt-4">

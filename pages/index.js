@@ -5,6 +5,7 @@ export default function Home() {
   const [product, setProduct] = useState('')
   const [length, setLength] = useState('media')
   const [result, setResult] = useState(null)
+  const [log, setLog] = useState([])
   const [loading, setLoading] = useState(false)
   const [selectedStyles, setSelectedStyles] = useState(['profesional', 'emocional', 'seo'])
   const [customTags, setCustomTags] = useState([])
@@ -12,12 +13,10 @@ export default function Home() {
   const [onlyCustom, setOnlyCustom] = useState(false)
   const [downloadFormat, setDownloadFormat] = useState('json')
 
-
   const handleSubmit = async () => {
     setLoading(true)
 
     let styles = []
-
     if (onlyCustom) {
       styles = [...customTags]
     } else {
@@ -35,55 +34,79 @@ export default function Home() {
 
     const data = await res.json()
     setResult(data)
+
+    setLog(prev => [
+      ...prev,
+      {
+        timestamp: new Date().toISOString(),
+        product,
+        sourceReview: review,
+        result: data
+      }
+    ])
+
     setLoading(false)
   }
 
-const handleDownload = () => {
-  if (!result) return
+  const handleDownload = () => {
+    if (!result) return
 
-  let content = ''
-  let mimeType = 'application/json'
+    let content = ''
+    let mimeType = 'application/json'
 
-  switch (downloadFormat) {
-    case 'json':
-      content = JSON.stringify(result, null, 2)
-      mimeType = 'application/json'
-      break
-    case 'html':
-      content = Object.entries(result)
-        .map(([style, text]) => `<h2>${style}</h2><p>${text}</p>`)
-        .join('<hr>')
-      mimeType = 'text/html'
-      break
-    case 'markdown':
-      content = Object.entries(result)
-        .map(([style, text]) => `## ${style}\n\n${text}`)
-        .join('\n\n---\n\n')
-      mimeType = 'text/markdown'
-      break
-    case 'txt':
-      content = Object.entries(result)
-        .map(([style, text]) => `${style.toUpperCase()}:\n${text}`)
-        .join('\n\n----------------------\n\n')
-      mimeType = 'text/plain'
-      break
-    default:
-      return
+    switch (downloadFormat) {
+      case 'json':
+        content = JSON.stringify(result, null, 2)
+        mimeType = 'application/json'
+        break
+      case 'html':
+        content = Object.entries(result)
+          .map(([style, text]) => `<h2>${style}</h2><p>${text}</p>`)
+          .join('<hr>')
+        mimeType = 'text/html'
+        break
+      case 'markdown':
+        content = Object.entries(result)
+          .map(([style, text]) => `## ${style}\n\n${text}`)
+          .join('\n\n---\n\n')
+        mimeType = 'text/markdown'
+        break
+      case 'txt':
+        content = Object.entries(result)
+          .map(([style, text]) => `${style.toUpperCase()}:\n${text}`)
+          .join('\n\n----------------------\n\n')
+        mimeType = 'text/plain'
+        break
+      default:
+        return
+    }
+
+    const blob = new Blob([content], { type: mimeType })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `testimonio-${product || 'producto'}.${downloadFormat}`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
-  const blob = new Blob([content], { type: mimeType })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `testimonio-${product || 'producto'}.${downloadFormat}`
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
-}
+  const handleLogDownload = () => {
+    if (!log.length) return
+    const blob = new Blob([JSON.stringify(log, null, 2)], {
+      type: 'application/json'
+    })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'historial-testimonios.json'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
 
-
-  
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow">
@@ -197,73 +220,106 @@ const handleDownload = () => {
           {loading ? 'Generando...' : 'Crear Testimonios'}
         </button>
 
+        {result && (
+          <div className="mt-4">
+            <label className="block text-sm font-medium mb-1">Formato de descarga:</label>
+            <select
+              value={downloadFormat}
+              onChange={(e) => setDownloadFormat(e.target.value)}
+              className="w-full p-2 border rounded mb-2 text-sm"
+            >
+              <option value="json">JSON</option>
+              <option value="html">HTML</option>
+              <option value="markdown">Markdown</option>
+              <option value="txt">Texto plano</option>
+            </select>
 
-{result && (
-  <div className="mt-4">
-    <label className="block text-sm font-medium mb-1">Formato de descarga:</label>
-    <select
-      value={downloadFormat}
-      onChange={(e) => setDownloadFormat(e.target.value)}
-      className="w-full p-2 border rounded mb-2 text-sm"
-    >
-      <option value="json">JSON</option>
-      <option value="html">HTML</option>
-      <option value="markdown">Markdown</option>
-      <option value="txt">Texto plano</option>
-    </select>
+            <button
+              onClick={handleDownload}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full"
+            >
+              Descargar testimonio
+            </button>
+          </div>
+        )}
 
-    <button
-      onClick={handleDownload}
-      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full"
-    >
-      Descargar testimonio
-    </button>
-  </div>
-)}
+        {result &&
+          Object.entries(result).map(([style, text]) => (
+            <div key={style} className="border p-4 rounded bg-gray-50 mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="font-semibold capitalize">{style}</h2>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => navigator.clipboard.writeText(text)}
+                    className="text-sm text-blue-500 hover:underline"
+                  >
+                    Copiar texto
+                  </button>
+                  <button
+                    onClick={() =>
+                      navigator.clipboard.writeText(`<blockquote><p>${text}</p></blockquote>`)
+                    }
+                    className="text-sm text-green-500 hover:underline"
+                  >
+                    Copiar HTML
+                  </button>
+                  <button
+                    onClick={() =>
+                      navigator.clipboard.writeText(JSON.stringify({ [style]: text }, null, 2))
+                    }
+                    className="text-sm text-purple-500 hover:underline"
+                  >
+                    Copiar JSON
+                  </button>
+                  <button
+                    onClick={() =>
+                      navigator.clipboard.writeText(`> ${text.replace(/\n/g, '\n> ')}\n> — ${style}`)
+                    }
+                    className="text-sm text-yellow-600 hover:underline"
+                  >
+                    Copiar Markdown
+                  </button>
+                </div>
+              </div>
+              <p className="text-sm text-gray-800">{text}</p>
+            </div>
+          ))}
 
+        {log.length > 0 && (
+          <div className="mt-6 border-t pt-4">
+            <h2 className="font-semibold mb-2">Historial de testimonios generados</h2>
+            <button
+              onClick={() => setLog([])}
+              className="text-sm text-red-600 hover:underline mb-2"
+            >
+              Vaciar historial
+            </button>
 
-      {result &&
-  Object.entries(result).map(([style, text]) => (
-    <div key={style} className="border p-4 rounded bg-gray-50 mb-4">
-      <div className="flex justify-between items-center mb-2">
-        <h2 className="font-semibold capitalize">{style}</h2>
-        <div className="flex gap-2">
-          <button
-            onClick={() => navigator.clipboard.writeText(text)}
-            className="text-sm text-blue-500 hover:underline"
-          >
-            Copiar texto
-          </button>
-          <button
-            onClick={() =>
-              navigator.clipboard.writeText(`<blockquote><p>${text}</p></blockquote>`)
-            }
-            className="text-sm text-green-500 hover:underline"
-          >
-            Copiar HTML
-          </button>
-          <button
-            onClick={() =>
-              navigator.clipboard.writeText(JSON.stringify({ [style]: text }, null, 2))
-            }
-            className="text-sm text-purple-500 hover:underline"
-          >
-            Copiar JSON
-          </button>
-          <button
-            onClick={() =>
-              navigator.clipboard.writeText(`> ${text.replace(/\n/g, '\n> ')}\n> — ${style}`)
-            }
-            className="text-sm text-yellow-600 hover:underline"
-          >
-            Copiar Markdown
-          </button>
-        </div>
-      </div>
-      <p className="text-sm text-gray-800">{text}</p>
-    </div>
-  ))}
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {log.map((entry, index) => (
+                <div key={index} className="bg-gray-100 p-2 rounded text-sm">
+                  <p>
+                    <strong>{entry.product}</strong> (
+                    {new Date(entry.timestamp).toLocaleString()})
+                  </p>
+                  <p className="text-gray-600 italic">"{entry.sourceReview}"</p>
+                  {Object.entries(entry.result).map(([style, text]) => (
+                    <p key={style}>
+                      <strong>{style}:</strong> {text}
+                    </p>
+                  ))}
+                </div>
+              ))}
+            </div>
 
+            <button
+              onClick={handleLogDownload}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mt-3 w-full"
+            >
+              Descargar historial
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

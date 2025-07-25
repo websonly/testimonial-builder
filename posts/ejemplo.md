@@ -1,7 +1,9 @@
 ---
-title: "Primer post del blog"
+title: "Mi primer post"
 date: "2025-07-25"
-description: "Esto es una descripción previa del primer post."
+description: "Este es un ejemplo de post para comprobar el blog."
 ---
 
-¡Hola mundo! Este es el contenido del primer post en **Markdown**.
+# Bienvenido
+
+Esto es el contenido principal en Markdown.

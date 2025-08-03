@@ -9,11 +9,15 @@ export default function Home() {
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4">
-        <Link href="/generate">
-          <a className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Generar Testimonio</a>
+        <Link href="/generador">
+          <a className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+            Generar Testimonio
+          </a>
         </Link>
         <Link href="/blog">
-          <a className="px-6 py-3 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Ver Blog</a>
+          <a className="px-6 py-3 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">
+            Ver Blog
+          </a>
         </Link>
       </div>
     </main>
